@@ -1,0 +1,16 @@
+[package]
+name = "lib-lexin"
+version = "0.1.0"
+edition = "2021"
+
+description = "A simple lexer library"
+readme = "README.md"
+authors = ["Prox"]
+repository = "https://github.com/proxin187/lib-lexin"
+keywords = ["lexer", "lexical", "parsing", "gen", "generator"]
+categories = ["command-line-interface", "command-line-utilities", "parsing"]
+license = "MIT OR Apache-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
