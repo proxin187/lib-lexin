@@ -88,7 +88,7 @@ pub fn is_ident(&self) -> Result<String, Box<dyn std::error::Error>>
 ```
 Token::is_integer
 ```rust
-    pub fn is_integer(&self) -> Result<usize, Box<dyn std::error::Error>>
+pub fn is_integer(&self) -> Result<usize, Box<dyn std::error::Error>>
 ```
 Token::is_float
 ```rust
