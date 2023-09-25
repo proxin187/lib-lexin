@@ -256,8 +256,7 @@ impl<'a> Lexer<'a> {
                     }
                 } else if mode == Mode::Section {
                     if &character == "\\" {
-                        index += 1;
-                        if index >= self.buffer.len() {
+                        if index + 1 >= self.buffer.len() {
                             return Ok(tokens);
                         } else {
                             token = token + &character;
