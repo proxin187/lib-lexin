@@ -44,8 +44,9 @@ pub struct Section {
     pub end: String,
 }
 
-impl ToString for Token {
-    fn to_string(&self) -> String {
+
+impl Token {
+    pub fn to_string(&self) -> String {
         return match self {
             Token::Keyword(keyword, _) => keyword.clone(),
             Token::Section(_, value, _) => value.clone(),
@@ -55,9 +56,7 @@ impl ToString for Token {
             Token::Ident(ident, _) => ident.clone(),
         };
     }
-}
 
-impl Token {
     pub fn loc(&self) -> Loc {
         return match self {
             Token::Keyword(_, loc) => *loc,
