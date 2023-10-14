@@ -271,7 +271,8 @@ impl<'a> Lexer<'a> {
                         if index + 1 >= self.buffer.len() {
                             return Ok(tokens);
                         } else {
-                            token = token + &character;
+                            index += 1;
+                            token = token + &(self.buffer[index] as char).to_string();
                         }
                     } else if let Ok(_) = self.is_section(Value::End(section[0].start.to_string(), character.clone())) { // index doesnt matter here because all indexes has the same start
                         token = token + &character;
