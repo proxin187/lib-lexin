@@ -35,6 +35,7 @@ pub struct Lexer<'a> {
     pub sections: Vec<Section>,
     pub symbols: Vec<(char, String)>,
     pub buffer: Vec<u8>,
+    pub allow_whitespace: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -144,12 +145,13 @@ impl<'a> Lexer<'a> {
         return vector;
     }
 
-    pub fn new(keywords: &[&'a str], sections: &[Section], symbols: &[(char, &'a str)]) -> Lexer<'a> {
+    pub fn new(keywords: &[&'a str], sections: &[Section], symbols: &[(char, &'a str)], allow_whitespace: bool) -> Lexer<'a> {
         return Lexer {
             keywords: keywords.to_vec(),
             sections: sections.to_vec(),
             symbols: Lexer::symbols_to_string(symbols),
             buffer: Vec::new(),
+            allow_whitespace,
         };
     }
 
@@ -211,23 +213,22 @@ impl<'a> Lexer<'a> {
     }
 
     fn lex_token(&self, token: &String, loc: Loc) -> Option<Token> {
-        if token != "\n" && token != "" {
-            if self.keywords.contains(&token.as_str()) {
-                return Some(Token::Keyword(token.clone(), loc));
-            } else if token.len() == 1 {
-                let character = token.chars().collect::<Vec<char>>()[0];
-                if let Some(symbol_name) = self.symbols_contain(&character) {
-                    return Some(Token::Symbol(character, symbol_name.to_string(), loc));
-                } else {
-                    return Some(self.is_numeric(token, loc));
-                }
-            } else if let Ok(name) = self.section_exists(&token[0..1], &token[token.len()-1..token.len()]) {
-                return Some(Token::Section(name, token[1..token.len() - 1].to_string(), loc));
+        if token == "\n" || token == "" {
+            return Some(Token::Ident(token.clone(), loc));
+        } else if self.keywords.contains(&token.as_str()) {
+            return Some(Token::Keyword(token.clone(), loc));
+        } else if token.len() == 1 {
+            let character = token.chars().collect::<Vec<char>>()[0];
+            if let Some(symbol_name) = self.symbols_contain(&character) {
+                return Some(Token::Symbol(character, symbol_name.to_string(), loc));
             } else {
                 return Some(self.is_numeric(token, loc));
             }
+        } else if let Ok(name) = self.section_exists(&token[0..1], &token[token.len()-1..token.len()]) {
+            return Some(Token::Section(name, token[1..token.len() - 1].to_string(), loc));
+        } else {
+            return Some(self.is_numeric(token, loc));
         }
-        return None;
     }
 
     pub fn tokenize(&mut self) -> Result<Vec<Token>, Box<dyn std::error::Error>> {
@@ -308,24 +309,12 @@ mod tests {
             &["def", "if", "return"],
             &[Section::new("comment", "/*", "*/")],
             &[(':', "column"), ('(', "openbrace"), (')', "closebrace")],
+            false,
         );
+
         lexer.load_str("def test(): return 0");
 
-        //let expected = [
-        //    Token::Keyword("def".to_string()),
-        //    Token::Ident("test".to_string()),
-        //    Token::Symbol('(', "openbrace".to_string()),
-        //    Token::Symbol(')', "closebrace".to_string()),
-        //    Token::Symbol(':', "column".to_string()),
-        //    Token::Keyword("return".to_string()),
-        //    Token::Integer(0, ),
-        //];
-
-        //let mut index = 0;
-        //for token in lexer.tokenize()? {
-        //    assert_eq!(token, expected[index]);
-        //    index += 1;
-        //}
+        println!("tokens: {:?}", lexer.tokenize()?);
         return Ok(());
     }
 }
