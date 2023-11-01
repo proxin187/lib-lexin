@@ -213,8 +213,14 @@ impl<'a> Lexer<'a> {
     }
 
     fn lex_token(&self, token: &String, loc: Loc) -> Option<Token> {
-        if token == "\n" || token == "" {
-            return Some(Token::Ident(token.clone(), loc));
+        if token == "\n" {
+            return None;
+        } else if token == "" {
+            if self.allow_whitespace {
+                return Some(Token::Ident(" ".to_string(), loc));
+            } else {
+                return None;
+            }
         } else if self.keywords.contains(&token.as_str()) {
             return Some(Token::Keyword(token.clone(), loc));
         } else if token.len() == 1 {
@@ -309,7 +315,7 @@ mod tests {
             &["def", "if", "return"],
             &[Section::new("comment", "/*", "*/")],
             &[(':', "column"), ('(', "openbrace"), (')', "closebrace")],
-            false,
+            true,
         );
 
         lexer.load_str("def test(): return 0");
