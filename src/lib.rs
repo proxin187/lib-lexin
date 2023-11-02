@@ -30,8 +30,8 @@ enum Mode {
 }
 
 #[derive(Debug)]
-pub struct Lexer<'a> {
-    pub keywords: Vec<&'a str>,
+pub struct Lexer {
+    pub keywords: Vec<String>,
     pub sections: Vec<Section>,
     pub symbols: Vec<(char, String)>,
     pub buffer: Vec<u8>,
@@ -136,20 +136,12 @@ impl Section {
     }
 }
 
-impl<'a> Lexer<'a> {
-    fn symbols_to_string(symbols: &[(char, &'a str)]) -> Vec<(char, String)> {
-        let mut vector: Vec<(char, String)> = Vec::new();
-        for symbol in symbols {
-            vector.push((symbol.0, symbol.1.to_string()));
-        }
-        return vector;
-    }
-
-    pub fn new(keywords: &[&'a str], sections: &[Section], symbols: &[(char, &'a str)], allow_whitespace: bool) -> Lexer<'a> {
+impl Lexer {
+    pub fn new(keywords: &[String], sections: &[Section], symbols: &[(char, String)], allow_whitespace: bool) -> Lexer {
         return Lexer {
             keywords: keywords.to_vec(),
             sections: sections.to_vec(),
-            symbols: Lexer::symbols_to_string(symbols),
+            symbols: symbols.to_vec(),
             buffer: Vec::new(),
             allow_whitespace,
         };
@@ -221,7 +213,7 @@ impl<'a> Lexer<'a> {
             } else {
                 return None;
             }
-        } else if self.keywords.contains(&token.as_str()) {
+        } else if self.keywords.contains(&token) {
             return Some(Token::Keyword(token.clone(), loc));
         } else if token.len() == 1 {
             let character = token.chars().collect::<Vec<char>>()[0];
@@ -312,9 +304,9 @@ mod tests {
     #[test]
     fn load_test() -> Result<(), Box<dyn std::error::Error>> {
         let mut lexer = Lexer::new(
-            &["def", "if", "return"],
+            &["def".to_string(), "if".to_string(), "return".to_string()],
             &[Section::new("comment", "/*", "*/")],
-            &[(':', "column"), ('(', "openbrace"), (')', "closebrace")],
+            &[(':', "column".to_string()), ('(', "openbrace".to_string()), (')', "closebrace".to_string())],
             true,
         );
 
