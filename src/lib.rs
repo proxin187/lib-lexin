@@ -53,7 +53,7 @@ impl Token {
             Token::Section(_, value, _) => value.clone(),
             Token::Integer(integer, _) => integer.to_string(),
             Token::Float(float, _) => float.to_string(),
-            Token::Symbol(_, value, _) => value.clone(),
+            Token::Symbol(value, _, _) => value.to_string(),
             Token::Ident(ident, _) => ident.clone(),
         };
     }
@@ -310,7 +310,7 @@ mod tests {
             true,
         );
 
-        lexer.load_str("def test(): return 0");
+        lexer.load_str("def test(): return 0 ");
 
         println!("tokens: {:?}", lexer.tokenize()?);
         return Ok(());
