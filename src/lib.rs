@@ -273,7 +273,8 @@ impl Lexer {
                             index += 1;
                             token = token + &(self.buffer[index] as char).to_string();
                         }
-                    } else if let Ok(_) = self.is_section(Value::End(section[0].start.to_string(), character.clone())) { // index doesnt matter here because all indexes has the same start
+                    } else if self.is_section(Value::End(section[0].start.to_string(), character.clone())).is_ok() || index + 2 >= self.buffer.len() { // index doesnt matter here because all indexes has the same start
+                        println!("Closed");
                         token = token + &character;
                         self.lex_token(&token, loc).map(|t| tokens.push(t));
                         section = Vec::new();
@@ -284,6 +285,7 @@ impl Lexer {
                     }
                 }
             }
+
             if &character == "\n" {
                 loc.0 += 1;
                 loc.1 = 1;
@@ -292,6 +294,7 @@ impl Lexer {
             }
             index += 1;
         }
+
         return Ok(tokens);
     }
 }
@@ -305,12 +308,12 @@ mod tests {
     fn load_test() -> Result<(), Box<dyn std::error::Error>> {
         let mut lexer = Lexer::new(
             &["def".to_string(), "if".to_string(), "return".to_string()],
-            &[Section::new("comment", "/*", "*/")],
+            &[Section::new("string", "\"", "\"")],
             &[(':', "column".to_string()), ('(', "openbrace".to_string()), (')', "closebrace".to_string())],
             true,
         );
 
-        lexer.load_str("def test(): return 0 ");
+        lexer.load_str("def test(): \" return 0 ");
 
         println!("tokens: {:?}", lexer.tokenize()?);
         return Ok(());
