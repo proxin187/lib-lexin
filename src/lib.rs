@@ -274,7 +274,6 @@ impl Lexer {
                             token = token + &(self.buffer[index] as char).to_string();
                         }
                     } else if self.is_section(Value::End(section[0].start.to_string(), character.clone())).is_ok() || index + 2 >= self.buffer.len() { // index doesnt matter here because all indexes has the same start
-                        println!("Closed");
                         token = token + &character;
                         self.lex_token(&token, loc).map(|t| tokens.push(t));
                         section = Vec::new();
