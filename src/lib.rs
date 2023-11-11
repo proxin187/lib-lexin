@@ -29,7 +29,7 @@ enum Mode {
     Normal,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Lexer {
     pub keywords: Vec<String>,
     pub sections: Vec<Section>,
@@ -274,6 +274,8 @@ impl Lexer {
                             token = token + &(self.buffer[index] as char).to_string();
                         }
                     } else if self.is_section(Value::End(section[0].start.to_string(), character.clone())).is_ok() || index + 2 >= self.buffer.len() { // index doesnt matter here because all indexes has the same start
+                        // NOTE: REMOVE BEFORE PUSHING
+                        println!("CLOSED");
                         token = token + &character;
                         self.lex_token(&token, loc).map(|t| tokens.push(t));
                         section = Vec::new();
@@ -308,11 +310,12 @@ mod tests {
         let mut lexer = Lexer::new(
             &["def".to_string(), "if".to_string(), "return".to_string()],
             &[Section::new("string", "\"", "\"")],
-            &[(':', "column".to_string()), ('(', "openbrace".to_string()), (')', "closebrace".to_string())],
+            &[(':', "column".to_string()), ('(', "openbrace".to_string()), (')', "closebrace".to_string()), (' ', "space".to_string())],
             true,
         );
 
-        lexer.load_str("def test(): \" return 0 ");
+        //lexer.load_str("def test(): \" return 0 ");
+        lexer.load_str("\"  ");
 
         println!("tokens: {:?}", lexer.tokenize()?);
         return Ok(());
